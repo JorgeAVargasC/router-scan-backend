@@ -76,16 +76,21 @@ def obtain_cve_info_from_api(scan_results_adapted):
     
     for index, vulnerability in enumerate(scan_results_adapted['vulnerabilities']):
         response = requests.get(f"{url}/{vulnerability['cve']}")
-        data = response.json()
         
         if response.status_code == 200:
-            scan_results_adapted_cve_info['vulnerabilities'][index]['id'] = data['id']
-            scan_results_adapted_cve_info['vulnerabilities'][index]['cvss'] = data['cvss']
-            scan_results_adapted_cve_info['vulnerabilities'][index]['severity'] = obtain_severity_from_cvss(data['cvss'])
-            scan_results_adapted_cve_info['vulnerabilities'][index]['summary'] = data['summary']
-            scan_results_adapted_cve_info['vulnerabilities'][index]['modified'] = data['Modified']
-            scan_results_adapted_cve_info['vulnerabilities'][index]['published'] = data['Published']
-            scan_results_adapted_cve_info['vulnerabilities'][index]['recommendations'] = data['capec']
+            try:
+                data = response.json()
+                scan_results_adapted_cve_info['vulnerabilities'][index]['id'] = data['id']
+                scan_results_adapted_cve_info['vulnerabilities'][index]['cvss'] = data['cvss']
+                scan_results_adapted_cve_info['vulnerabilities'][index]['severity'] = obtain_severity_from_cvss(data['cvss'])
+                scan_results_adapted_cve_info['vulnerabilities'][index]['summary'] = data['summary']
+                scan_results_adapted_cve_info['vulnerabilities'][index]['modified'] = data['Modified']
+                scan_results_adapted_cve_info['vulnerabilities'][index]['published'] = data['Published']
+                scan_results_adapted_cve_info['vulnerabilities'][index]['recommendations'] = data['capec']
+            except json.decoder.JSONDecodeError:
+                # Manejo del error de decodificación JSON
+                # Aquí puedes agregar el código para manejar la situación en la que no se pueda decodificar la respuesta JSON
+                pass
             
     return scan_results_adapted_cve_info
 
