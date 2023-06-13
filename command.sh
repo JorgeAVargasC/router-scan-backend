@@ -13,3 +13,5 @@ docker run \
   --network router-scan-bridge-network \
   --publish 5000:5000 \
   javargas1209/router-scan-backend
+
+  # --network router-scan-bridge-network \

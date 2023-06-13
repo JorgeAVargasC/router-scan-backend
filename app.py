@@ -12,6 +12,21 @@ def get_default_gateway():
     print(f"default gateway: { gateway }")
     return gateway
 
+def get_real_default_gateway_docker():
+    interfaces = ni.interfaces()
+    print (interfaces)
+    for interface in interfaces:
+        if interface.startswith('eth'):
+            iface_data = ni.ifaddresses(interface)
+            print (iface_data)
+            if ni.AF_INET in iface_data:
+                for link in iface_data[ni.AF_INET]:
+                    print (link)
+                    if 'addr' in link:
+                        print (link['addr'])
+                        return link['addr']
+        
+
 def scan_for_vulns(target,command):
     scanner = nmap.PortScanner()
     scan_results = scanner.scan(hosts=target, arguments=command)
@@ -19,7 +34,8 @@ def scan_for_vulns(target,command):
     return scan_results
 
 def data_adapter(scan_results,gateway):
-    mac = scan_results['scan'][gateway]['addresses']['mac']
+    # mac = scan_results['scan'][gateway]['addresses']['mac']
+    mac = scan_results['scan'][gateway]['addresses']['mac'] if 'mac' in scan_results['scan'][gateway]['addresses'] else '00:00:00:00:00:00' 
     tcp_ports = scan_results['scan'][gateway]['tcp']
     result = []
 
@@ -35,7 +51,7 @@ def data_adapter(scan_results,gateway):
                         })
                         
     scan_results_adapted = {
-        'vendor': scan_results['scan'][gateway]['vendor'][mac],
+        'vendor': scan_results['scan'][gateway]['vendor'][mac] if mac in scan_results['scan'][gateway]['vendor'] else 'Unknown',
         'vulnerabilities': result
     }
     
@@ -82,6 +98,8 @@ def save_results_as_json(data,name):
 app = Flask(__name__)
 CORS(app)
 
+gateway = get_real_default_gateway_docker()
+
 @app.route('/')
 def index():
     return 'Hello World!'
@@ -89,8 +107,9 @@ def index():
 @app.route('/scan')
 def scan():
     gateway = get_default_gateway()
+    # gateway = get_real_default_gateway_docker()
     
-    scan_results = scan_for_vulns(gateway, "nmap -sV --script vulners")
+    scan_results = scan_for_vulns(gateway, 'nmap -sV --script vulners')
     save_results_as_json(scan_results,'1-scan_results.json')
     
     scan_results_adapted = data_adapter(scan_results,gateway)
