@@ -1,5 +1,7 @@
 from flask import Flask, jsonify
 from flask_cors import CORS
+from bson import ObjectId
+import json
 
 #* ============ (Core functions) ============ *#
 
@@ -25,17 +27,18 @@ def scan():
     # gateway = get_real_default_gateway_docker()
     
     scan_results = scan_for_vulns(gateway, 'nmap -sV --script vulners')
-    save_results_as_json(scan_results,'1-scan_results.json')
+    save_results_as_json(scan_results, '1-scan_results.json')
     
-    scan_results_adapted = data_adapter(scan_results,gateway)
+    scan_results_adapted = data_adapter(scan_results, gateway)
     save_results_as_json(scan_results_adapted, '2-scan_results_adapted.json')
 
     if len(scan_results_adapted['vulnerabilities']) == 0:
         return jsonify(scan_results_adapted)
     
-    scan_results_adapted_cve_info = obtain_cve_info_from_api(scan_results_adapted) 
+    scan_results_adapted_cve_info = obtain_cve_info_from_api(scan_results_adapted)  
+    
     save_results_as_json(scan_results_adapted_cve_info, '3-scan_results_adapted_cve_info.json')
-    save_results_in_db(scan_results_adapted_cve_info)   
+    save_results_in_db(scan_results_adapted_cve_info)
     
     return jsonify(scan_results_adapted_cve_info)
 

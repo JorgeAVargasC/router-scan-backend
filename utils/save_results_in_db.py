@@ -9,11 +9,16 @@ def save_results_in_db(data):
     try:
         client.admin.command('ping')
         print("Pinged your deployment. You successfully connected to MongoDB!")
-        
+
         db = client['router_scan_db']
         collection = db['router_scan_results']
-        
-        collection.insert_one(data)
-        
+
+        # Convert data to a dictionary and remove the _id field
+        data_dict = dict(data)
+        data_dict.pop('_id', None)
+
+        id = collection.insert_one(data_dict)
+        print(id)
+
     except Exception as e:
         print(e)
