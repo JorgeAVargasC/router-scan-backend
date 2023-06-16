@@ -1,7 +1,5 @@
 from flask import Flask, jsonify
 from flask_cors import CORS
-from bson import ObjectId
-import json
 
 #* ============ (Core functions) ============ *#
 
@@ -11,6 +9,9 @@ from utils.data_adapter import data_adapter
 from utils.save_results_as_json import save_results_as_json
 from utils.obtain_cve_info_from_api import obtain_cve_info_from_api
 from utils.get_default_gateway import get_default_gateway
+from utils.db_connection import db_connection
+from utils.get_db_results import get_db_results
+from utils.obtain_isp_info_from_api import obtain_isp_info_from_api
 
 #* ========= API ========= *#
 
@@ -30,6 +31,7 @@ def scan():
     save_results_as_json(scan_results, '1-scan_results.json')
     
     scan_results_adapted = data_adapter(scan_results, gateway)
+    scan_results_adapted = obtain_isp_info_from_api(scan_results_adapted)
     save_results_as_json(scan_results_adapted, '2-scan_results_adapted.json')
 
     if len(scan_results_adapted['vulnerabilities']) == 0:
@@ -38,9 +40,19 @@ def scan():
     scan_results_adapted_cve_info = obtain_cve_info_from_api(scan_results_adapted)  
     
     save_results_as_json(scan_results_adapted_cve_info, '3-scan_results_adapted_cve_info.json')
-    save_results_in_db(scan_results_adapted_cve_info)
+    
+    collection = db_connection()
+    save_results_in_db(collection, scan_results_adapted_cve_info)
     
     return jsonify(scan_results_adapted_cve_info)
+
+@app.route('/results')
+def results():
+    collection = db_connection()
+    results = get_db_results(collection)
+    
+    return results
+    
 
 if __name__ == '__main__':
     app.run(debug=True)
