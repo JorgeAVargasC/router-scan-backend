@@ -46,8 +46,8 @@ def scan():
     
     return jsonify(scan_results_adapted_cve_info)
 
-@app.route('/results')
-def results():
+@app.route('/scan/all')
+def getAllScans():
     collection = db_connection()
     results = get_db_results(collection)
     
