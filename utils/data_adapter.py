@@ -9,7 +9,7 @@ def data_adapter(scan_results,gateway):
             if 'vulners' in tcp_ports[port]['script']:
                 vulners = tcp_ports[port]['script']['vulners'].split('\n')
                 for index, vuln in enumerate(vulners):
-                    if 'CVE' in vuln:
+                    if (('CVE' in vuln) & ('OSV' not in vuln)):
                         result.append({
                             'cve': vulners[index].split('\t')[1],
                             'port': port

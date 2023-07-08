@@ -13,8 +13,7 @@ def obtain_cve_info_from_api(scan_results_adapted):
         if response.status_code == 200:
             try:
                 data = response.json()
-                print(data)
-                severity = obtain_severity_from_cvss(data['cvss'])
+                severity = obtain_severity_from_cvss(data['cvss']) if (data['cvss'] != None) else 'None'
                 scan_results_adapted_cve_info['vulnerabilities'][index]['id'] = data['id']
                 scan_results_adapted_cve_info['vulnerabilities'][index]['cvss'] = data['cvss']
                 scan_results_adapted_cve_info['vulnerabilities'][index]['severity'] = severity
