@@ -1,3 +1,4 @@
+import json
 from flask import Flask, jsonify
 from flask_cors import CORS
 
@@ -25,7 +26,6 @@ def index():
 @app.route('/scan')
 def scan():
     gateway = get_default_gateway()
-    # gateway = get_real_default_gateway_docker()
     
     scan_results = scan_for_vulns(gateway, 'nmap -sV --script vulners')
     save_results_as_json(scan_results, '1-scan_results.json')
@@ -60,3 +60,5 @@ if __name__ == '__main__':
 
 
 
+
+    
