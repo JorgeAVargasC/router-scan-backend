@@ -2,6 +2,7 @@ import bcrypt
 
 
 from flask import Flask, jsonify, request
+from flask import Flask, jsonify
 from flask_cors import CORS
 
 
@@ -31,7 +32,6 @@ def index():
 @app.route('/scan')
 def scan():
     gateway = get_default_gateway()
-    # gateway = get_real_default_gateway_docker()
     
     scan_results = scan_for_vulns(gateway, 'nmap -sV --script vulners')
     save_results_as_json(scan_results, '1-scan_results.json')
@@ -39,15 +39,16 @@ def scan():
     scan_results_adapted = data_adapter(scan_results, gateway)
     scan_results_adapted = obtain_isp_info_from_api(scan_results_adapted)
     save_results_as_json(scan_results_adapted, '2-scan_results_adapted.json')
+    collection = db_connection()
 
     if len(scan_results_adapted['vulnerabilities']) == 0:
+        save_results_in_db(collection, scan_results_adapted)
         return jsonify(scan_results_adapted)
     
     scan_results_adapted_cve_info = obtain_cve_info_from_api(scan_results_adapted)  
     
     save_results_as_json(scan_results_adapted_cve_info, '3-scan_results_adapted_cve_info.json')
     
-    collection = db_connection()
     save_results_in_db(collection, scan_results_adapted_cve_info)
     
     return jsonify(scan_results_adapted_cve_info)
@@ -128,14 +129,10 @@ def login():
         print(e)
         return jsonify({'error': 'Error al iniciar sesión'}), 500
         
-
-
-# if __name__ != '__main__':
-#     app.run(debug=True, port=3000)
-
 if __name__ == '__main__':
-    app.run(debug=True)
-    app.run(port=3000)
+    app.run(debug=True,port=3000)
 
 
 
+
+    
