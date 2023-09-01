@@ -1,5 +1,9 @@
-from flask import Flask, jsonify
+import bcrypt
+
+
+from flask import Flask, jsonify, request
 from flask_cors import CORS
+
 
 #* ============ (Core functions) ============ *#
 
@@ -11,7 +15,9 @@ from utils.obtain_cve_info_from_api import obtain_cve_info_from_api
 from utils.get_default_gateway import get_default_gateway
 from utils.db_connection import db_connection
 from utils.get_db_results import get_db_results
+from utils.get_db_results_filter import get_db_results_filter
 from utils.obtain_isp_info_from_api import obtain_isp_info_from_api
+from utils.obtain_user_collection import obtain_user_collection
 
 #* ========= API ========= *#
 
@@ -50,12 +56,86 @@ def scan():
 def getAllScans():
     collection = db_connection()
     results = get_db_results(collection)
-    
+
+    return results
+
+
+@app.route('/scan/filter', methods=['POST'])
+def getScanByFilter():
+    collection = db_connection()
+    results = get_db_results_filter(collection)
+
     return results
     
 
+@app.route('/register', methods=['POST'])
+def register_user():
+    
+    try:
+        users_collection = obtain_user_collection()
+        
+        user_data = request.get_json()
+        
+        existent_user = users_collection.find_one({'email': user_data['email']})
+        
+        if existent_user:
+            return jsonify({'error': 'El Usuario ya existe'}), 400
+        
+        hashed_password = bcrypt.hashpw(user_data['password'].encode('utf-8'), bcrypt.gensalt())
+        
+        users_collection.insert_one({
+            'name': user_data['name'],
+            'email': user_data['email'],
+            'role': user_data['role'] if 'role' in user_data else 'USER',
+            'asn': user_data['asn'] if 'asn' in user_data else None,
+            'password': hashed_password,
+        })
+        
+        return jsonify({'message': 'Usuario creado exitosamente'}), 201
+    
+    except Exception as e:
+        print(e)
+        return jsonify({'error': 'Error al crear el usuario'}), 500
+    
+
+@app.route('/login', methods=['POST'])
+def login():
+    try:
+        # Obtiene los datos de inicio de sesión del cuerpo de la solicitud
+        login_data = request.get_json()
+        
+        users_collection = obtain_user_collection()
+        
+        # Busca el usuario en la base de datos por su correo electrónico
+        user = users_collection.find_one({'email': login_data['email']})
+        
+        if user:
+            # Compara la contraseña proporcionada con la contraseña almacenada en la base de datos
+            if bcrypt.checkpw(login_data['password'].encode('utf-8'), user['password']):
+                return jsonify({'message': 'Inicio de sesión exitoso',
+                                'user': {
+                                    'name': user['name'],
+                                    'email': user['email'],
+                                    'role': user['role'],
+                                    'asn': user['asn']
+                                }
+                            }), 200
+            else:
+                return jsonify({'error': 'Credenciales incorrectas'}), 401
+        else:
+            return jsonify({'error': 'Usuario no encontrado'}), 404
+    except Exception as e:
+        print(e)
+        return jsonify({'error': 'Error al iniciar sesión'}), 500
+        
+
+
+# if __name__ != '__main__':
+#     app.run(debug=True, port=3000)
+
 if __name__ == '__main__':
     app.run(debug=True)
+    app.run(port=3000)
 
 
 

@@ -10,7 +10,5 @@ def get_db_results(collection):
     # Serializa los documentos a JSON
     json_data = json_util.dumps(data)
 
-    print(json_data)
-
     return json_data
   
