@@ -1,4 +1,4 @@
-def data_adapter(scan_results,gateway):
+def data_adapter(scan_results,gateway,userId):
     # mac = scan_results['scan'][gateway]['addresses']['mac']
     mac = scan_results['scan'][gateway]['addresses']['mac'] if 'mac' in scan_results['scan'][gateway]['addresses'] else '00:00:00:00:00:00' 
     tcp_ports = scan_results['scan'][gateway]['tcp']
@@ -17,6 +17,7 @@ def data_adapter(scan_results,gateway):
                             })
                         
     scan_results_adapted = {
+        'userId': userId,
         'vendor': scan_results['scan'][gateway]['vendor'][mac] if mac in scan_results['scan'][gateway]['vendor'] else 'Unknown',
         'vulnerabilities': result
     }

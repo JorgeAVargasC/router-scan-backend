@@ -29,14 +29,15 @@ CORS(app)
 def index():
     return 'Hello World!'
 
-@app.route('/scan')
+@app.route('/scan', methods=['POST'])
 def scan():
+    userId = request.get_json()['userId']
     gateway = get_default_gateway()
     
     scan_results = scan_for_vulns(gateway, 'nmap -sV --script vulners')
     save_results_as_json(scan_results, '1-scan_results.json')
     
-    scan_results_adapted = data_adapter(scan_results, gateway)
+    scan_results_adapted = data_adapter(scan_results, gateway, userId)
     scan_results_adapted = obtain_isp_info_from_api(scan_results_adapted)
     save_results_as_json(scan_results_adapted, '2-scan_results_adapted.json')
     collection = db_connection()
@@ -115,6 +116,7 @@ def login():
             if bcrypt.checkpw(login_data['password'].encode('utf-8'), user['password']):
                 return jsonify({'message': 'Inicio de sesión exitoso',
                                 'user': {
+                                    '_id': str(user['_id']),
                                     'name': user['name'],
                                     'email': user['email'],
                                     'role': user['role'],

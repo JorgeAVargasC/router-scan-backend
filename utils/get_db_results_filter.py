@@ -2,15 +2,18 @@ from flask import jsonify,request
 
 def get_db_results_filter(collection):
     try:
-        asn = request.get_json()['asn']
+        asn = request.get_json()['asn'] if 'asn' in request.get_json() else None
+        userId = request.get_json()['userId'] if 'userId' in request.get_json() else None
         
         # Define un filtro basado en el ASN
-        filter_query = {'connection.asn': {'$in': asn}}
+        filter_query = {'connection.asn': {'$in': asn}} if asn else None
+        
+        filter_query_userId = {'userId': userId} if userId else None
 
-        projection = {'_id': 1, 'connection': 1}
+        # projection = {'_id': 1, 'connection': 1}
 
         # Busca documentos que coincidan con el filtro en la colección
-        cursor = collection.find(filter_query,projection)
+        cursor = collection.find(filter_query) if asn else collection.find(filter_query_userId)
 
         # Convierte el cursor a una lista de diccionarios
         data = [doc for doc in cursor]
