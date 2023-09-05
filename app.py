@@ -1,5 +1,5 @@
 import bcrypt
-
+import time
 
 from flask import Flask, jsonify, request
 from flask import Flask, jsonify
@@ -33,23 +33,32 @@ def index():
 def scan():
     userId = request.get_json()['userId']
     gateway = get_default_gateway()
+    start_time = time.time()
     
     scan_results = scan_for_vulns(gateway, 'nmap -sV --script vulners')
     save_results_as_json(scan_results, '1-scan_results.json')
     
     scan_results_adapted = data_adapter(scan_results, gateway, userId)
     scan_results_adapted = obtain_isp_info_from_api(scan_results_adapted)
-    save_results_as_json(scan_results_adapted, '2-scan_results_adapted.json')
     collection = db_connection()
 
     if len(scan_results_adapted['vulnerabilities']) == 0:
+        # save_results_in_db(collection, scan_results_adapted)
+        end_time = time.time()
+        elapsed_time = end_time - start_time
+        scan_results_adapted['scanningTime'] = elapsed_time
+        save_results_as_json(scan_results_adapted, '2-scan_results_adapted.json')
         save_results_in_db(collection, scan_results_adapted)
+        
         return jsonify(scan_results_adapted)
     
     scan_results_adapted_cve_info = obtain_cve_info_from_api(scan_results_adapted)  
     
-    save_results_as_json(scan_results_adapted_cve_info, '3-scan_results_adapted_cve_info.json')
+    end_time = time.time()
+    elapsed_time = end_time - start_time
+    scan_results_adapted_cve_info['scanningTime'] = elapsed_time
     
+    save_results_as_json(scan_results_adapted_cve_info, '3-scan_results_adapted_cve_info.json')
     save_results_in_db(collection, scan_results_adapted_cve_info)
     
     return jsonify(scan_results_adapted_cve_info)
