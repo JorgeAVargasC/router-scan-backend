@@ -22,6 +22,11 @@ def get_db_results_filter(collection):
         for doc in data:
             if '_id' in doc:
                 doc['_id'] = str(doc['_id'])
+                
+
+        # sort data by date 
+        
+        data.sort(key=lambda x: x['timezone']['current_time'], reverse=True)
 
         return jsonify({
             "total": len(data),

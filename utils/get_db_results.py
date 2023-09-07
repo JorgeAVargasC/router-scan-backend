@@ -1,4 +1,4 @@
-from bson import json_util
+from flask import jsonify
 
 def get_db_results(collection):
     # Obtiene todos los documentos de la colección
@@ -7,8 +7,13 @@ def get_db_results(collection):
     # Convierte el cursor a una lista de diccionarios
     data = [doc for doc in cursor]
 
+    for doc in data:
+            if '_id' in doc:
+                doc['_id'] = str(doc['_id'])
+    
     # Serializa los documentos a JSON
-    json_data = json_util.dumps(data)
+    
+    data.sort(key=lambda x: x['timezone']['current_time'], reverse=True)
 
-    return json_data
+    return jsonify(data), 200
   
