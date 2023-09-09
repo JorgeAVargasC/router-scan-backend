@@ -8,24 +8,31 @@ def get_top_port_cve():
         collection = db["router_scan_results"]
 
         pipeline = [
-            {
-                "$unwind": "$vulnerabilities"
-            },
+            {"$unwind": "$vulnerabilities"},
             {
                 "$group": {
                     "_id": {
                         "ip": "$ip",
-                        "port": "$vulnerabilities.port"
+                        "port": "$vulnerabilities.port",
+                        # "cve": "$vulnerabilities.cve",
                     },
-                    "count": {"$sum": 1}
+                    "count": {"$sum": 1},
                 }
             },
             {
                 "$group": {
                     "_id": "$_id.port",
-                    "total_vulnerabilities": {"$sum": "$count"}
+                    # "cve": {
+                    #     "$push": {
+                    #         "cve": "$_id.cve",
+                    #         "count": "$count",
+                    #         "ip": "$_id.ip",
+                    #     }
+                    # },
+                    "cve_count": {"$sum": "$count"},
                 }
             },
+            {"$sort": {"cve_count": -1}},
         ]
 
         isp_data = list(collection.aggregate(pipeline))
