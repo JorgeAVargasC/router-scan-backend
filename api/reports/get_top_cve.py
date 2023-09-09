@@ -9,12 +9,6 @@ def get_top_cve():
 
         # * ==================== (CVE) ===================== *#
 
-        unique_cves = collection.distinct("vulnerabilities.cve")
-
-        cve_data = {}
-        for cve in unique_cves:
-            cve_data[cve] = 0
-
         pipeline = [
             {
                 "$group": {

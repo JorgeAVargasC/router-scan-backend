@@ -9,12 +9,6 @@ def get_top_vendor():
 
         # * ==================== (VENDOR) ===================== *#
 
-        unique_vendors = collection.distinct("vendor")
-
-        vendors_data = {}
-        for vendor in unique_vendors:
-            vendors_data[vendor] = 0
-
         pipeline = [
             {
                 "$group": {

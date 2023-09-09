@@ -28,6 +28,7 @@ from api.reports.get_top_isp import get_top_isp
 from api.reports.get_top_vendor import get_top_vendor
 from api.reports.get_top_vendor_cve import get_top_vendor_cve
 from api.reports.get_top_ip import get_top_ip
+from api.reports.get_top_isp_cve import get_top_isp_cve
 
 app = Flask(__name__)
 CORS(app)
@@ -176,6 +177,7 @@ def reports():
 def api_get_top_cve():
     return get_top_cve()
 
+
 @app.route("/reports/ip")
 def api_get_top_ip():
     return get_top_ip()
@@ -186,9 +188,15 @@ def api_get_top_isp():
     return get_top_isp()
 
 
+@app.route("/reports/isp/cve")
+def api_get_top_isp_cve():
+    return get_top_isp_cve()
+
+
 @app.route("/reports/vendor")
 def api_get_top_vendor():
     return get_top_vendor()
+
 
 @app.route("/reports/vendor/cve")
 def api_get_top_vendor_cve():

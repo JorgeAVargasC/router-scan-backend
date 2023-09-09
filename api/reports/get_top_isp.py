@@ -9,12 +9,6 @@ def get_top_isp():
 
         # * ==================== (ISP) ===================== *#
 
-        unique_isp = collection.distinct("isp")
-
-        isp_data = {}
-        for isp in unique_isp:
-            isp_data[isp] = 0
-
         pipeline = [
             {
                 "$group": {
