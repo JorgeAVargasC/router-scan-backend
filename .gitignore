@@ -2,7 +2,9 @@
 env/
 
 __pycache__/
-*.json
+1-scan_results.json
+2-scan_results_adapted.json
+3-scan_results_adapted_cve_info.json
 
 # Logs
 logs

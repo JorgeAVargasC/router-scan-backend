@@ -1,0 +1,46 @@
+{
+  "userId": "64f6976b56ac3b582e9a2459",
+  "vendor": "Arris Group",
+  "vulnerabilities": [
+    {
+      "cve": "CVE-2017-8798",
+      "port": 5000,
+      "id": "CVE-2017-8798",
+      "cvss": 7.5,
+      "severity": "HIGH",
+      "summary": "Integer signedness error in MiniUPnP MiniUPnPc v1.4.20101221 through v2.0 allows remote attackers to cause a denial of service or possibly have unspecified other impact.",
+      "modified": "2020-04-30T18:15:00",
+      "published": "2017-05-11T01:29:00"
+    }
+  ],
+  "ip": "181.137.211.188",
+  "continent": "South America",
+  "continent_code": "SA",
+  "country": "Colombia",
+  "country_code": "CO",
+  "region": "Cauca",
+  "region_code": "CAU",
+  "city": "Popay\u00e1n",
+  "latitude": 2.4448143,
+  "longitude": -76.6147395,
+  "flag": {
+    "img": "https://cdn.ipwhois.io/flags/co.svg",
+    "emoji": "\ud83c\udde8\ud83c\uddf4",
+    "emoji_unicode": "U+1F1E8 U+1F1F4"
+  },
+  "connection": {
+    "asn": 13489,
+    "org": "EPM Telecomunicaciones S.A. E.S.P.",
+    "isp": "EPM Telecomunicaciones S.A. E.S.P.",
+    "domain": "epm.net.co"
+  },
+  "timezone": {
+    "id": "America/Bogota",
+    "abbr": "-05",
+    "is_dst": false,
+    "offset": -18000,
+    "utc": "-05:00",
+    "current_time": "2023-09-07T00:33:37-05:00"
+  },
+  "scanningTime": 82.91858625411987
+}
