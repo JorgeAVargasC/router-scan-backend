@@ -22,12 +22,15 @@ def get_top_cve():
             {
                 "$group": {
                     "_id": "$root.vulnerabilities.id",
+                    "severity": {"$first": "$root.vulnerabilities.severity"},
+                    "cvss": {"$first": "$root.vulnerabilities.cvss"},
                     "count": {"$sum": 1},
                 }
             },
             {
                 "$sort": {
                     "count": -1,
+                    "cvss": -1,
                 }
             },
         ]
