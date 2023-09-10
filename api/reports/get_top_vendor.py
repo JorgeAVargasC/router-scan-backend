@@ -14,10 +14,9 @@ def get_top_vendor():
                 "$group": {
                     "_id": "$ip",
                     "count": {"$sum": 1},
-                    "root": {"$addToSet": "$$ROOT"},
+                    "root": {"$first": "$$ROOT"}, # Esto es para obtener el primer elemento de cada grupo
                 }
             },
-            {"$match": {"count": 1}},
             {"$unwind": "$root"},
             {
                 "$group": {

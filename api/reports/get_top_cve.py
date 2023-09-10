@@ -14,10 +14,9 @@ def get_top_cve():
                 "$group": {
                     "_id": "$ip",
                     "count": {"$sum": 1},
-                    "root": {"$addToSet": "$$ROOT"},
+                    "root": {"$first": "$$ROOT"},
                 }
             },
-            {"$match": {"count": 1}},
             {"$unwind": "$root"},
             {"$unwind": "$root.vulnerabilities"},
             {

@@ -19,10 +19,9 @@ def get_top_vendor_cve():
                 "$group": {
                     "_id": "$ip",
                     "ip_count": {"$sum": 1},
-                    "root": {"$addToSet": "$$ROOT"},
+                    "root": {"$first": "$$ROOT"},
                 }
             },
-            {"$match": {"ip_count": 1}},
             {"$unwind": "$root"},
             {
                 "$group": {
