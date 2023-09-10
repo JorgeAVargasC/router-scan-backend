@@ -11,25 +11,78 @@ def get_top_port_cve():
             {"$unwind": "$vulnerabilities"},
             {
                 "$group": {
-                    "_id": {
-                        "ip": "$ip",
-                        "port": "$vulnerabilities.port",
-                        # "cve": "$vulnerabilities.cve",
-                    },
-                    "count": {"$sum": 1},
+                    "_id": "$vulnerabilities.port",
+                    "cve": {"$addToSet": "$vulnerabilities"},
+                    "port_count": {"$sum": 1},
                 }
             },
             {
-                "$group": {
-                    "_id": "$_id.port",
-                    # "cve": {
-                    #     "$push": {
-                    #         "cve": "$_id.cve",
-                    #         "count": "$count",
-                    #         "ip": "$_id.ip",
-                    #     }
-                    # },
-                    "cve_count": {"$sum": "$count"},
+                "$addFields": {
+                    "cve_count": {"$size": "$cve"},
+                    "cve_critical": {
+                        "$size": {
+                            "$filter": {
+                                "input": "$cve",
+                                "as": "cve",
+                                "cond": {"$eq": ["$$cve.severity", "CRITICAL"]},
+                            }
+                        }
+                    },
+                    "cve_high": {
+                        "$size": {
+                            "$filter": {
+                                "input": "$cve",
+                                "as": "cve",
+                                "cond": {"$eq": ["$$cve.severity", "HIGH"]},
+                            }
+                        }
+                    },
+                    "cve_medium": {
+                        "$size": {
+                            "$filter": {
+                                "input": "$cve",
+                                "as": "cve",
+                                "cond": {"$eq": ["$$cve.severity", "MEDIUM"]},
+                            }
+                        }
+                    },
+                    "cve_low": {
+                        "$size": {
+                            "$filter": {
+                                "input": "$cve",
+                                "as": "cve",
+                                "cond": {"$eq": ["$$cve.severity", "LOW"]},
+                            }
+                        }
+                    },
+                    "cve_none": {
+                        "$size": {
+                            "$filter": {
+                                "input": "$cve",
+                                "as": "cve",
+                                "cond": {"$eq": ["$$cve.severity", "None"]},
+                            }
+                        }
+                    },
+                }
+            },
+            {
+                "$project": {
+                    "_id": 1,
+                    "port": "$_id",
+                    "cve": {
+                        "cvss": 1,
+                        "id": 1,
+                        "port": 1,
+                        "severity": 1,
+                    },
+                    "cve_count": 1,
+                    "cve_critical": 1,
+                    "cve_high": 1,
+                    "cve_medium": 1,
+                    "cve_low": 1,
+                    "cve_none": 1,
+                    "port_count": 1,
                 }
             },
             {"$sort": {"cve_count": -1}},
