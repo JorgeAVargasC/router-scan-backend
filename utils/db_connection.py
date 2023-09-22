@@ -1,8 +1,21 @@
 from pymongo.mongo_client import MongoClient
 from pymongo.server_api import ServerApi
 
+from dotenv import load_dotenv
+ 
+load_dotenv()
+
+from dotenv import dotenv_values
+ 
+env = dotenv_values(".env") 
+
+USERNAME = env["USERNAME"]
+PASSWORD = env["PASSWORD"]
+HOSTNAME = env["HOSTNAME"]
+
 def db_connection():
-    uri = "mongodb+srv://root:1234@cluster0.xvqlwek.mongodb.net/?retryWrites=true&w=majority"
+    uri = f"mongodb+srv://{USERNAME}:{PASSWORD}@{HOSTNAME}/?retryWrites=true&w=majority"
+    print(uri)
     client = MongoClient(uri, server_api=ServerApi('1'))
     
     try:

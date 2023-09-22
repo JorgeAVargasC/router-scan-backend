@@ -14,6 +14,8 @@ def get_top_ip_scanning_time():
                 "$group": {
                     "_id": "$ip",
                     "scanning_time": {"$first": "$scanningTime"},
+                    "vendor": {"$first": "$vendor"},
+                    "isp": {"$first": "$connection.isp"},
                 }
             },
             {
